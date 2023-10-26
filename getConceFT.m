@@ -9,9 +9,10 @@ addpath('/Volumes/Time-Frequency-Analysis-Matlab-code/Morse') ;
 % signal: 1D array [# of time points, 1]
 % This is the signal that we want to calculate ConceFT repreentation for.
 % J: int
-% number of chosen orthonormal windows for ConceFT
+% number of chosen orthonormal windows for ConceFT. In the paper, J = 3
 % Q: int
-% number of random linear combinations of chosen windows
+% number of random linear combinations of chosen windows. In the paper, Q =
+% 30
 % FrequencyAxisResolution: float 
 % The resolution of frequency axis. 1e-3 or 1e-4 is recommended.
 % Hz: float

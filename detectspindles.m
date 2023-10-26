@@ -1,99 +1,8 @@
 
-base_dir = "/Volumes/Riki2tb/PRUV/Sleep/";
-data_dir = fullfile(base_dir, "Dream_Spindle_Data");
-result_dir = fullfile(base_dir, "Dream_Spindle_Results");
-conceft_dir = fullfile(base_dir, "Dream_Spindle_ConceFT");
 
-
-%%% Set parameters used to get result
-Hz = 50;
-fmin = 12;
-fmax = 15;
-tmin = 300;
-tmax = 3000;
-min_distance_ms = 300;
-adapt_band = 0;
-only_NREM = 0;
-
-FrequencyAxisResolution = 1e-2;
-resolution = 1/FrequencyAxisResolution;
-
-NoWindowsInConceFT = 3;
-NoConceFT = 30;
-factor = 2;
-WindowBandwidth = 10;
-
-
-epsilons = (0.05:0.15:0.50);
-deltas = (1:0.5:3)';
-
-subjects = ["1", "2", "3", "4", "5", "6"];
-
-
-sensitivities = zeros(length(subjects), length(epsilons), length(deltas));
-precisions = zeros(length(subjects),  length(epsilons), length(deltas));
-f1s = zeros(length(subjects),  length(epsilons), length(deltas));
-
-tfrsqtic = linspace(0, 0.4, 0.4*resolution)';
-
-%[ConceFT, ConceFT_ftic, hypnogram, idx_expert] = load_files(conceft_dir, data_dir, subjects(1), Hz, NoWindowsInConceFT, NoConceFT, factor, WindowBandwidth, resolution);
-[precision, sensitivity, f1, idx_detect] = detectspindles2(ConceFT, tfrsqtic, epsilons(3), deltas(2), fmin, fmax, tmin, tmax, min_distance_ms, adapt_band, resolution, idx_expert, hypnogram, Hz);
-
-
-
-% function [ConceFT, ConceFT_ftic, hypnogram, idx_expert] = load_files(conceft_dir, data_dir, subject, Hz, NoWindowsInConceFT, NoConceFT, factor, WindowBandwidth, resolution)
-%     total_time = 1800; 
-%     hypnogram = zeros(total_time*Hz, 1);
-%     tfrsqtic = linspace(0, 0.4, 0.4*resolution)';
-%     filename = fullfile(conceft_dir,'ConceFT0'+ subject + '_' + num2str(NoWindowsInConceFT) + '_' + num2str(NoConceFT) + '_' +  num2str(factor) + '_' +  num2str(WindowBandwidth)  + '_' + num2str(resolution) + '.mat');
-%     ConceFT = load(filename).ConceFT;
-%     
-%     %%% Get the indices for thresholded normalized power in sigma band
-%     ConceFT_ftic = Hz * tfrsqtic;
-% 
-%     
-%     filename_hyp = "Hypnogram_excerpt" + subject + ".txt";
-%     filepath_hyp = fullfile(data_dir, filename_hyp);
-%     hypnogram_temp = importdata(filepath_hyp).data;
-%     for i = 1:length(hypnogram_temp)
-%         hypnogram((i-1)*250+1:i*250) = hypnogram_temp(i);
-%     end
-% 
-%     
-%     filename_expert1 = "Visual_scoring1_excerpt" + subject + ".txt";
-%     %%% Convert Expert1 text file expert scoring of spindles into 1D array
-%     filepath_expert1 = fullfile(data_dir, filename_expert1);
-%     expert_txt1 = importdata(filepath_expert1);
-%     expert_score1 = uint32(expert_txt1.data*Hz);
-%     
-%     idx_expert1 = zeros(total_time*Hz, 1);
-%     for i = 1:length(expert_score1)
-%         idx_expert1(expert_score1(i, 1):(expert_score1(i, 1)+expert_score1(i, 2))) = 1;
-%     end
-%     
-%     filename_expert2 = "Visual_scoring2_excerpt" + subject + ".txt";
-%     %%% Convert Expert2 text file expert scoring of spindles into 1D array
-%     filepath_expert2 = fullfile(data_dir, filename_expert2);
-%     idx_expert2 = zeros(total_time*Hz, 1);
-%     
-%     expert_txt2 = importdata(filepath_expert2);
-%     expert_score2 = uint32(expert_txt2.data*Hz);
-%     for i = 1:length(expert_score2)
-%         idx_expert2(expert_score2(i, 1):(expert_score2(i, 1)+expert_score2(i, 2))) = 1;
-%     end
-% 
-%     %%% Get the union on Expert1 and Expert2 annotations
-%     idx_expert = idx_expert1 | idx_expert2;
-%     
-% end
-
-
-
-
-function [precision, sensitivity, f1, idx_detect] = detectspindles2(ConceFT, tfrsqtic, epsilon, delta, fmin, fmax, tmin, tmax, min_distance_ms, adapt_band, resolution, idx_expert, hypnogram, Hz)
+function [precision, sensitivity, f1, idx_detect] = detectspindles(ConceFT, tfrsqtic, epsilon, delta, fmin, fmax, tmin, tmax, min_distance_ms, adapt_band, idx_expert, hypnogram, Hz)
 
 %%% Parameters
-
 % ConceFT: 2D array
 %   ConceFT representation of the signal. 2d matrix [# of freq index, # of time points]
 % epsilon: float
@@ -110,17 +19,13 @@ function [precision, sensitivity, f1, idx_detect] = detectspindles2(ConceFT, tfr
 %   they will be merged. In the paper, min_ditance_ms = 3000
 % adapt_band: Boolean (1/0)
 %   usually set to 0. Don't use 1 unless you understand what the code does
-% resolution: float
-%   resolution = 1/FrequencyAxisResolution where FrequencyAxisResolution is
-%   a parameter used to obtain ConceFT. If FrequencyAxisResolution = 1e-4,
-%   resolution = 10000
 % idx_expert: 1d array, column vector [# of time points, 1]
 %   array that indicates whether a spindle exist at each time point, labeled
 %   by expert. Should be the same length as # of time points of ConceFT
 % hypnogram: 1d array, column vector [# of time points, 1]
 %   array that indicates the sleep stage at each time point, labeled.
 %   by expert. Should be the same length as # of time points of ConceFT.
-%   For the N2 sleep stage, hypnoram entry must be 2
+%   For the N2 sleep stage, the value must be 2
 % Hz: float
 %   frequency of the signals
 %%%

@@ -30,7 +30,7 @@ function [precision, sensitivity, f1, idx_detect, dur_stats, density_stats] = de
 %   array that indicates the sleep stage at each time point, labeled.
 %   by expert. Should be the same length as # of time points of ConceFT.
 %   For the N2 sleep stage, hypnoram entry must be 2
-% Hz: float
+% Hz: int
 %   frequency of the signals
 % range: float
 %   frequency range used to calculate sigma band energy. The code averages 

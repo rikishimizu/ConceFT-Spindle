@@ -1,9 +1,7 @@
 
 function [tfrsqtic, ConceFT] = getConceFT(signal, J, Q, FrequencyAxisResolution, Hz)
 % Add path to the ConceFT codes in your environment
-addpath('/Volumes/Time-Frequency-Analysis-Matlab-code');
-addpath('/Volumes/Time-Frequency-Analysis-Matlab-code/tool') ;
-addpath('/Volumes/Time-Frequency-Analysis-Matlab-code/Morse') ;
+addpath("/Path/to/your/ConceFT/Directory");
 
 %% setup parameters for the SST or ConceFT
 % signal: 1D array [# of time points, 1]
@@ -13,9 +11,9 @@ addpath('/Volumes/Time-Frequency-Analysis-Matlab-code/Morse') ;
 % Q: int
 % number of random linear combinations of chosen windows. In the paper, Q =
 % 30
-% FrequencyAxisResolution: float 
+% FrequencyAxisResolution: float
 % The resolution of frequency axis. 1e-3 or 1e-4 is recommended.
-% Hz: float
+% Hz: int
 % The sampling frequency of signals
 
 
@@ -26,7 +24,7 @@ addpath('/Volumes/Time-Frequency-Analysis-Matlab-code/Morse') ;
 % roughly 7-10 oscillations (ignore the multiples) are
 % included in the window.
 factor = 2;
-WindowLength = factor * Hz+1 ; % 
+WindowLength = factor * Hz+1 ; %
 % this is the bandwith of the chosen window. See hermf.m
 % in the attached code for details.
 WindowBandwidth = 10;
@@ -55,9 +53,16 @@ HOP = 1;
 % tfrtic: frequency axis tic for the STFT
 % tfrsq: synchrosqueezed STFT (it is equivalent to running ConceFT only one time)
 % ConceFT: ConceFT of synchrosqueezed STFT.
-% tfrsqtic: frequency axis tic for the tfrsq and ConceFT
-[tfr, tfrtic, tfrsq, ConceFT, tfrsqtic] = ConceFT_STFT(signal, LowFrequencyLimit, ...
+% % tfrsqtic: frequency axis tic for the tfrsq and ConceFT
+% [tfr, tfrtic, tfrsq, ConceFT, tfrsqtic] = ConceFT_STFT(signal, LowFrequencyLimit, ...
+%     HighFrequencyLimit, FrequencyAxisResolution, HOP, WindowLength, ...
+%     J, WindowBandwidth, Q, 1, 0);
+
+
+[tfr, tfrtic, tfrsq, ConceFT, tfrsqtic] = ConceFT_sqSTFT_C(signal, LowFrequencyLimit, ...
     HighFrequencyLimit, FrequencyAxisResolution, HOP, WindowLength, ...
     J, WindowBandwidth, Q, 1, 0);
+
+
 end
 
